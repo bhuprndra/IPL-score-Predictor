@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IPL Score Predictor</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a class="nav-logo" href="#">
+        <div class="logo-icon">🏏</div>
+        <div>
+          <div class="logo-text">IPL Score Predictor</div>
+          <div class="logo-sub">Powered by Random Forest Machine Learning Algorithm</div>
+        </div>
+      </a>
+      <div class="nav-badge">Live Predictions</div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-eyebrow">🏆 Indian Premier League</div>
+      <h1>Predicting The Score</h1>
+      <p>Enter match details and let our ML model forecast the final scores.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">10</div>
+          <div class="hero-stat-label">IPL Teams</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">10+</div>
+          <div class="hero-stat-label">Venues</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">Machine Learning</div>
+          <div class="hero-stat-label">Powered Model</div>
+        </div>
+      </div>
+    </div>
+
+    <main class="main">
+      <div class="card">
+        <div class="card-title">Match Setup</div>
+        <form id="predict-form">
+          <div class="form-grid">
+            <!-- Batting Team -->
+            <div class="form-group">
+              <label>🏏 Batting Team</label>
+              <div class="select-wrap">
+                <select id="batting_team" name="batting_team" required>
+                  <option value="" disabled selected>Select batting team</option>
+                  {% for team in teams %}
+                    <option value="{{ team }}">{{ team }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Bowling Team -->
+            <div class="form-group">
+              <label>🎯 Bowling Team</label>
+              <div class="select-wrap">
+                <select id="bowling_team" name="bowling_team" required>
+                  <option value="" disabled selected>Select bowling team</option>
+                  {% for team in teams %}
+                    <option value="{{ team }}">{{ team }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label>🏟 City</label>
+              <div class="select-wrap">
+                <select id="venue" name="venue" required>
+    <option value="" disabled selected>Select venue</option>
+
+    {% for venue in venues %}
+        <option value="{{ venue }}">{{ venue }}</option>
+    {% endfor %}
+</select>
+              </div>
+            </div>
+
+            <div class="divider-vs">Current Innings Detail</div>
+
+            <!-- Overs -->
+            <div class="form-group">
+              <label>⏱ Current Overs</label>
+              <input type="number" id="overs" name="overs" min="0.1" max="19.5" step="0.1" placeholder="e.g. 12.3" required />
+              <div class="input-hint">Between 0.1 and 19.5 overs</div>
+            </div>
+
+            <!-- Runs -->
+            <div class="form-group">
+              <label>🏃 Runs Scored</label>
+              <input type="number" id="runs" name="runs" min="0" max="400" step="1" placeholder="e.g. 87" required />
+            </div>
+
+            <!-- Wickets -->
+            <div class="form-group">
+              <label>❌ Wickets Fallen</label>
+              <input type="number" id="wickets" name="wickets" min="0" max="9" step="1" placeholder="e.g. 3" required />
+            </div>
+
+            <!-- Runs last 5 -->
+            <div class="form-group">
+              <label>📈 Runs in Last 5 Overs</label>
+              <input type="number" id="runs_last5" name="runs_last5" min="0" max="150" step="1" placeholder="e.g. 47" required />
+            </div>
+
+            <!-- Wickets last 5 -->
+            <div class="form-group full">
+              <label>📉 Wickets in Last 5 Overs</label>
+              <input type="number" id="wickets_last5" name="wickets_last5" min="0" max="5" step="1" placeholder="e.g. 1" required />
+            </div>
+          </div>
+
+          <!-- Error message -->
+          <div class="error-box" id="error-box"></div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-predict" id="submit-btn">
+            <span class="btn-text">Predict The Final Score Of The Match 🚀</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+      </div>
+
+      <!-- RESULT SECTION -->
+      <div id="result-section">
+        <div class="result-card">
+          <div class="result-vs" id="result-vs"></div>
+          <div class="result-score-label">Predicted Final Score</div>
+          <div class="result-score" id="result-score">—</div>
+          <div class="result-range">
+            Expected range: <span id="result-range">—</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📊 Match Summary</div>
+          <div class="mini-stats" id="mini-stats"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- IPL TEAM LOGO STRIP -->
+    <section class="ipl-teams-strip">
+      <h3>Official IPL Teams</h3>
+      <div class="logo-slider">
+        <div class="logo-track">
+          <img src="{{ url_for('static', filename='images/csk.jpg') }}" alt="CSK" />
+          <img src="{{ url_for('static', filename='images/mi.jpg') }}" alt="MI" />
+          <img src="{{ url_for('static', filename='images/rcb.jpg') }}" alt="RCB" />
+          <img src="{{ url_for('static', filename='images/kkr.png') }}" alt="KKR" />
+          <img src="{{ url_for('static', filename='images/dc.jpg') }}" alt="DC" />
+          <img src="{{ url_for('static', filename='images/pbks.jpg') }}" alt="PBKS" />
+          <img src="{{ url_for('static', filename='images/rr.png') }}" alt="RR" />
+          <img src="{{ url_for('static', filename='images/srh.jpg') }}" alt="SRH" />
+          <img src="{{ url_for('static', filename='images/gt.png') }}" alt="GT" />
+          <img src="{{ url_for('static', filename='images/lsg.png') }}" alt="LSG" />
+          <!-- Duplicated for infinite scroll effect -->
+          <img src="{{ url_for('static', filename='images/csk.jpg') }}" alt="CSK" />
+          <img src="{{ url_for('static', filename='images/mi.jpg') }}" alt="MI" />
+          <img src="{{ url_for('static', filename='images/rcb.jpg') }}" alt="RCB" />
+          <img src="{{ url_for('static', filename='images/kkr.png') }}" alt="KKR" />
+          <img src="{{ url_for('static', filename='images/dc.jpg') }}" alt="DC" />
+          <img src="{{ url_for('static', filename='images/pbks.jpg') }}" alt="PBKS" />
+          <img src="{{ url_for('static', filename='images/rr.png') }}" alt="RR" />
+          <img src="{{ url_for('static', filename='images/srh.jpg') }}" alt="SRH" />
+          <img src="{{ url_for('static', filename='images/gt.png') }}" alt="GT" />
+          <img src="{{ url_for('static', filename='images/lsg.png') }}" alt="LSG" />
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>IPL Score Predictor based on Random Forest Machine Learning Algorithm</p>
+      <p>Machine Learning Model · Built with Flask + Python</p>
+      <p style="margin-top:6px;">Predictions are probabilistic estimates based on historical IPL data.</p>
+      <div style="margin-top: 10px;">
+        <p>
+          📧 Email: <a href="mailto:bhupendrarai1718@gmail.com">bhupendrarai1718@gmail.com</a>
+        </p>
+        <p>
+          💼 LinkedIn: <a href="https://www.linkedin.com/in/bhupendra-rai/" target="_blank">bhupendra-rai</a>
+        </p>
+      </div>
+    </footer>
+
+  
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
