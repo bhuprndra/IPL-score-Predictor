@@ -4,6 +4,10 @@ A full-stack web application that predicts IPL match scores using your own Machi
 
 ---
 
+## Live Demo
+
+https://ipl-score-predictor-j564.onrender.com/
+
 ## Project Structure
 
 ```
