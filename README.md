@@ -10,7 +10,7 @@ A full-stack web application that predicts IPL match scores using your own Machi
 ipl-predictor/
 ├── app.py              ← Flask backend + prediction logic
 ├── requirements.txt    ← Python dependencies
-├── model.pkl           ← YOUR trained ML model (drop it here)
+├── model.joblib           ← YOUR trained ML model (drop it here)
 ├── static/
 │   └── css/
 │       └──style.cs
